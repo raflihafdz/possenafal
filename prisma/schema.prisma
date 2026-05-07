@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  QRIS
+}
+
+enum TransactionStatus {
+  COMPLETED
+  CANCELLED
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  SALE
+}
+
+model User {
+  id              String           @id @default(cuid())
+  name            String
+  email           String           @unique
+  password        String
+  role            Role             @default(CASHIER)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  transactions    Transaction[]
+  stockMovements  StockMovement[]
+
+  @@map("users")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             String           @id @default(cuid())
+  categoryId     String
+  code           String           @unique
+  barcode        String?          @unique
+  name           String
+  description    String?
+  purchasePrice  Float
+  sellingPrice   Float
+  stock          Int              @default(0)
+  minStock       Int              @default(5)
+  image          String?
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  category       Category         @relation(fields: [categoryId], references: [id])
+  transactionItems TransactionItem[]
+  stockMovements StockMovement[]
+
+  @@map("products")
+}
+
+model Transaction {
+  id             String             @id @default(cuid())
+  invoiceNumber  String             @unique
+  userId         String
+  totalAmount    Float
+  discount       Float              @default(0)
+  grandTotal     Float
+  paidAmount     Float
+  changeAmount   Float
+  paymentMethod  PaymentMethod
+  status         TransactionStatus  @default(COMPLETED)
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  user           User               @relation(fields: [userId], references: [id])
+  items          TransactionItem[]
+
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id            String      @id @default(cuid())
+  transactionId String
+  productId     String
+  productName   String
+  price         Float
+  quantity      Int
+  discount      Float       @default(0)
+  subtotal      Float
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  product       Product     @relation(fields: [productId], references: [id])
+
+  @@map("transaction_items")
+}
+
+model StockMovement {
+  id            String            @id @default(cuid())
+  productId     String
+  userId        String
+  type          StockMovementType
+  quantity      Int
+  stockBefore   Int
+  stockAfter    Int
+  referenceType String?
+  referenceId   String?
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  product       Product           @relation(fields: [productId], references: [id])
+  user          User              @relation(fields: [userId], references: [id])
+
+  @@map("stock_movements")
+}
