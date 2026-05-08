@@ -181,8 +181,8 @@ export function TransactionsContent() {
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val === "all" ? "" : val); setPage(1); }}>
-          <SelectTrigger className="w-[160px]">
+        <Select value={statusFilter} onValueChange={(val: string | null) => { setStatusFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
+          <SelectTrigger className="w-40">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
@@ -193,9 +193,9 @@ export function TransactionsContent() {
         </Select>
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
-          <Input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setPage(1); }} className="w-[160px]" />
+          <Input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setPage(1); }} className="w-40" />
           <span className="text-muted-foreground">to</span>
-          <Input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setPage(1); }} className="w-[160px]" />
+          <Input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setPage(1); }} className="w-40" />
         </div>
       </div>
 

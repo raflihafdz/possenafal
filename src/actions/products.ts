@@ -34,16 +34,7 @@ export async function getProducts(params?: {
   const finalWhere = lowStock
     ? {
         ...where,
-        stock: undefined,
-        AND: [
-          ...(where.AND ? (Array.isArray(where.AND) ? where.AND : [where.AND]) : []),
-          {
-            OR: [
-              { stock: { equals: 0 } },
-              // We'll handle minStock comparison at the application level
-            ],
-          },
-        ],
+        stock: { equals: 0 },
       }
     : where;
 
@@ -60,7 +51,7 @@ export async function getProducts(params?: {
 
   // Filter low stock at application level if needed
   const filteredProducts = lowStock
-    ? products.filter((p) => p.stock <= p.minStock)
+    ? products.filter((p: any) => p.stock <= p.minStock)
     : products;
 
   return {
@@ -100,7 +91,7 @@ export async function searchProducts(query: string) {
 export async function createProduct(data: unknown) {
   const validated = productSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   try {
@@ -130,7 +121,7 @@ export async function createProduct(data: unknown) {
 export async function updateProduct(id: string, data: unknown) {
   const validated = productSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   try {

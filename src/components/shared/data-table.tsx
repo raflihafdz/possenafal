@@ -68,14 +68,14 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg border bg-card">
+    <div className="space-y-4 w-full overflow-hidden">
+      <div className="rounded-lg border bg-card overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold">
+                  <TableHead key={header.id} className="font-semibold text-xs md:text-sm whitespace-nowrap">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -104,7 +104,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-xs md:text-sm">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -137,41 +137,50 @@ export function DataTable<TData, TValue>({
               ? `Showing ${table.getRowModel().rows.length} of ${data.length} results`
               : `Page ${currentPage} of ${pageCount}`}
           </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                clientPagination
-                  ? table.previousPage()
-                  : onPageChange?.(currentPage - 1)
-              }
-              disabled={
-                clientPagination
-                  ? !table.getCanPreviousPage()
-                  : currentPage <= 1
-              }
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                clientPagination
-                  ? table.nextPage()
-                  : onPageChange?.(currentPage + 1)
-              }
-              disabled={
-                clientPagination
-                  ? !table.getCanNextPage()
-                  : currentPage >= (pageCount || 1)
-              }
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center justify-between gap-1 md:gap-2 flex-wrap">
+            <span className="text-xs md:text-sm text-muted-foreground">
+              {clientPagination
+                ? `Page ${table.getState().pagination.pageIndex + 1}`
+                : `Page ${currentPage}`}
+            </span>
+            <div className="flex items-center gap-1 md:gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  clientPagination
+                    ? table.previousPage()
+                    : onPageChange?.(currentPage - 1)
+                }
+                disabled={
+                  clientPagination
+                    ? !table.getCanPreviousPage()
+                    : currentPage <= 1
+                }
+                className="h-8 px-2 md:px-3 text-xs md:text-sm"
+              >
+                <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                <span className="hidden sm:inline ml-1">Previous</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  clientPagination
+                    ? table.nextPage()
+                    : onPageChange?.(currentPage + 1)
+                }
+                disabled={
+                  clientPagination
+                    ? !table.getCanNextPage()
+                    : currentPage >= (pageCount || 1)
+                }
+                className="h-8 px-2 md:px-3 text-xs md:text-sm"
+              >
+                <span className="hidden sm:inline mr-1">Next</span>
+                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       )}

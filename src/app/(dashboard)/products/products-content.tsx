@@ -296,21 +296,21 @@ export function ProductsContent() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-          <p className="text-muted-foreground">Manage your product inventory</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Products</h1>
+          <p className="text-xs md:text-sm text-muted-foreground">Manage your product inventory</p>
         </div>
-        <Button onClick={handleOpenCreate} className="gap-2">
+        <Button onClick={handleOpenCreate} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           Add Product
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 md:gap-4">
+        <div className="relative flex-1 min-w-50 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search products..."
@@ -319,8 +319,8 @@ export function ProductsContent() {
             className="pl-9"
           />
         </div>
-        <Select value={categoryFilter} onValueChange={(val) => { setCategoryFilter(val === "all" ? "" : val); setPage(1); }}>
-          <SelectTrigger className="w-[200px]">
+        <Select value={categoryFilter} onValueChange={(val: string | null) => { setCategoryFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
+          <SelectTrigger className="w-50">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -338,15 +338,15 @@ export function ProductsContent() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md md:max-w-2xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
           <DialogHeader>
-            <DialogTitle>{editingProduct ? "Edit Product" : "Create Product"}</DialogTitle>
+            <DialogTitle className="text-lg md:text-xl">{editingProduct ? "Edit Product" : "Create Product"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Product Code</Label>
-                <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} placeholder="PRD-001" required />
+                <Label className="text-xs md:text-sm">Product Code</Label>
+                <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} placeholder="PRD-001" required className="text-sm" />
               </div>
               <div className="space-y-2">
                 <Label>Barcode</Label>
@@ -359,7 +359,7 @@ export function ProductsContent() {
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select value={formData.categoryId} onValueChange={(val) => setFormData({ ...formData, categoryId: val })}>
+              <Select value={formData.categoryId || ""} onValueChange={(val: string | null) => setFormData({ ...formData, categoryId: val || "" })}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (

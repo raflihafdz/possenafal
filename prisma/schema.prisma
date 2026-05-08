@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -13,8 +14,9 @@ enum Role {
 
 enum PaymentMethod {
   CASH
-  TRANSFER
+  DEBIT
   QRIS
+  TRANSFER
 }
 
 enum TransactionStatus {
@@ -132,4 +134,29 @@ model StockMovement {
   user          User              @relation(fields: [userId], references: [id])
 
   @@map("stock_movements")
+}
+
+model DebitBank {
+  id              String    @id @default(cuid())
+  bankName        String    @unique
+  accountNumber   String
+  accountHolder   String
+  isActive        Boolean   @default(true)
+  displayOrder    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("debit_banks")
+}
+
+model QrisCode {
+  id              String    @id @default(cuid())
+  qrisData        String    // QR code data/URL
+  merchantName    String
+  displayText     String    @default("Scan QRIS")
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("qris_codes")
 }

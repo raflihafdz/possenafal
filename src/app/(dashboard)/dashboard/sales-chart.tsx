@@ -52,7 +52,7 @@ export function SalesChart({ data }: SalesChartProps) {
             if (active && payload && payload.length) {
               return (
                 <div className="rounded-lg border bg-background p-3 shadow-md">
-                  <p className="text-sm font-medium">{formatDate(label)}</p>
+                  <p className="text-sm font-medium">{formatDate(String(label))}</p>
                   <p className="text-sm text-primary font-semibold">
                     Rp {payload[0].value?.toLocaleString("id-ID")}
                   </p>

@@ -28,12 +28,13 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       <div
         className={cn(
           "transition-all duration-300",
-          collapsed ? "md:ml-[70px]" : "md:ml-[260px]"
+          "ml-0 md:ml-65",
+          collapsed && "md:ml-17.5"
         )}
       >
         <Navbar user={user} onMenuToggle={() => setCollapsed(!collapsed)} />
 
-        <main className="p-6">{children}</main>
+        <main className="p-2 sm:p-3 md:p-6 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

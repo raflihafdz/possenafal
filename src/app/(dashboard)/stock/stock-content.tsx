@@ -206,7 +206,7 @@ export function StockContent() {
       accessorKey: "notes",
       header: "Notes",
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
+        <span className="text-sm text-muted-foreground truncate max-w-50 block">
           {row.original.notes || "-"}
         </span>
       ),
@@ -246,8 +246,8 @@ export function StockContent() {
                 className="pl-9"
               />
             </div>
-            <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val === "all" ? "" : val); setPage(1); }}>
-              <SelectTrigger className="w-[160px]">
+            <Select value={typeFilter} onValueChange={(val: string | null) => { setTypeFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
+              <SelectTrigger className="w-40">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -314,7 +314,7 @@ export function StockContent() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Product</Label>
-              <Select value={formData.productId} onValueChange={(val) => setFormData({ ...formData, productId: val })}>
+              <Select value={formData.productId || ""} onValueChange={(val: string | null) => setFormData({ ...formData, productId: val || "" })}>
                 <SelectTrigger><SelectValue placeholder="Select product" /></SelectTrigger>
                 <SelectContent>
                   {products.map((p) => (

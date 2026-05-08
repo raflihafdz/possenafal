@@ -13,13 +13,13 @@ export async function createStockMovement(data: unknown) {
 
   const validated = stockMovementSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   const { productId, type, quantity, notes } = validated.data;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       const product = await tx.product.findUnique({
         where: { id: productId },
       });
@@ -146,5 +146,5 @@ export async function getLowStockProducts() {
     orderBy: { stock: "asc" },
   });
 
-  return products.filter((p) => p.stock <= p.minStock);
+  return products.filter((p: any) => p.stock <= p.minStock);
 }

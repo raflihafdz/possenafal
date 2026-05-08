@@ -71,10 +71,17 @@ export function ReceiptContent({ transaction }: { transaction: Transaction }) {
           <Button variant="outline" size="sm" onClick={handleShare} className="gap-1">
             <Share2 className="h-4 w-4" /> Share
           </Button>
-          <Button variant="outline" size="sm" asChild className="gap-1">
-            <a href={`/api/receipt/${transaction.invoiceNumber}/pdf`}>
-              <Download className="h-4 w-4" /> PDF
-            </a>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = `/api/receipt/${transaction.invoiceNumber}/pdf`;
+              link.click();
+            }}
+          >
+            <Download className="h-4 w-4" /> PDF
           </Button>
         </div>
 
@@ -84,7 +91,7 @@ export function ReceiptContent({ transaction }: { transaction: Transaction }) {
           className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white p-6 text-center">
+          <div className="bg-linear-to-br from-blue-600 to-indigo-600 text-white p-6 text-center">
             <div className="flex justify-center mb-3">
               <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
                 <Store className="h-6 w-6" />

@@ -14,7 +14,7 @@ export async function createTransaction(data: unknown) {
 
   const validated = checkoutSchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   const { items, totalAmount, discount, grandTotal, paidAmount, paymentMethod, notes } = validated.data;
@@ -24,7 +24,7 @@ export async function createTransaction(data: unknown) {
   }
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Verify stock availability
       for (const item of items) {
         const product = await tx.product.findUnique({

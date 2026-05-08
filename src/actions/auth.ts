@@ -8,7 +8,7 @@ export async function loginAction(formData: { email: string; password: string })
   const validated = loginSchema.safeParse(formData);
 
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   try {

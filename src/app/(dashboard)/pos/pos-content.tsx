@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { searchProducts } from "@/actions/products";
+import { searchProducts, getProducts } from "@/actions/products";
+import { getAllCategories } from "@/actions/categories";
 import { createTransaction } from "@/actions/transactions";
 import { formatCurrency } from "@/utils";
 import type { CartItem } from "@/schemas";
@@ -43,6 +44,11 @@ interface SearchProduct {
   sellingPrice: number;
   stock: number;
   category: { name: string };
+}
+
+interface POSCategory {
+  id: string;
+  name: string;
 }
 
 export function POSContent() {
@@ -59,8 +65,58 @@ export function POSContent() {
   const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [lastInvoice, setLastInvoice] = useState("");
+  
+  // New states for category view
+  const [categories, setCategories] = useState<POSCategory[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [categoryProducts, setCategoryProducts] = useState<SearchProduct[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  
   const searchRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const result = await getAllCategories();
+        setCategories(result);
+        if (result.length > 0) {
+          setSelectedCategoryId(result[0].id);
+        }
+      } catch {
+        toast.error("Failed to load categories");
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Load products for selected category
+  useEffect(() => {
+    if (!selectedCategoryId) return;
+
+    const loadCategoryProducts = async () => {
+      setIsLoadingProducts(true);
+      try {
+        const result = await getProducts({
+          categoryId: selectedCategoryId,
+          limit: 100,
+        });
+        setSearchResults([]);
+        setShowResults(false);
+        setCategoryProducts(result.products as SearchProduct[]);
+      } catch {
+        toast.error("Failed to load products");
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    loadCategoryProducts();
+  }, [selectedCategoryId]);
 
   // Calculate totals
   const totalAmount = cart.reduce((sum, item) => sum + item.subtotal, 0);
@@ -223,6 +279,15 @@ export function POSContent() {
       setCheckoutDialogOpen(false);
       setReceiptDialogOpen(true);
       clearCart();
+      
+      // Reload products to refresh stock numbers
+      if (selectedCategoryId) {
+        const reloadedProducts = await getProducts({
+          categoryId: selectedCategoryId,
+          limit: 100,
+        });
+        setCategoryProducts(reloadedProducts.products as SearchProduct[]);
+      }
     } catch {
       toast.error("Transaction failed");
     } finally {
@@ -233,12 +298,12 @@ export function POSContent() {
   const quickAmounts = [10000, 20000, 50000, 100000, 200000, 500000];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)]">
+    <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 h-[calc(100vh-8rem)] overflow-hidden p-2 md:p-4">
       {/* Left Panel - Product Search */}
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">POS Cashier</h1>
-          <p className="text-sm text-muted-foreground">
+      <div className="flex-1 flex flex-col min-h-0 min-w-0">
+        <div className="mb-2 md:mb-4">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">POS Cashier</h1>
+          <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
             Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F2</kbd> to search
             {" • "}
             <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F9</kbd> to checkout
@@ -246,15 +311,15 @@ export function POSContent() {
         </div>
 
         {/* Search */}
-        <div ref={searchContainerRef} className="relative mb-4">
+        <div ref={searchContainerRef} className="relative mb-2 md:mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
               ref={searchRef}
-              placeholder="Search products by name, code, or scan barcode..."
+              placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-11 h-12 text-base"
+              className="pl-10 md:pl-11 h-10 md:h-12 text-sm md:text-base"
             />
             {isSearching && (
               <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
@@ -263,7 +328,7 @@ export function POSContent() {
 
           {/* Search Results Dropdown */}
           {showResults && searchResults.length > 0 && (
-            <Card className="absolute z-50 w-full mt-1 shadow-lg max-h-[400px] overflow-auto">
+            <Card className="absolute z-50 w-full mt-1 shadow-lg max-h-96 overflow-auto">
               <CardContent className="p-0">
                 {searchResults.map((product) => (
                   <button
@@ -299,6 +364,82 @@ export function POSContent() {
             </Card>
           )}
         </div>
+
+        {/* Category Selection */}
+        {!searchQuery && (
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Categories</h3>
+            {isLoadingCategories ? (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="h-20 w-24 rounded-lg bg-muted animate-pulse shrink-0"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategoryId(category.id)}
+                    className={`shrink-0 px-4 py-3 rounded-lg font-medium text-sm transition-all whitespace-nowrap ${
+                      selectedCategoryId === category.id
+                        ? "bg-primary text-primary-foreground shadow-md"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Category Products Grid */}
+        {!searchQuery && selectedCategoryId && (
+          <div className="mb-4">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
+              Products {isLoadingProducts && "• Loading..."}
+            </h3>
+            {isLoadingProducts ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="h-24 bg-muted animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
+            ) : categoryProducts.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 max-h-48 overflow-y-auto">
+                {categoryProducts.map((product) => (
+                  <button
+                    key={product.id}
+                    onClick={() => addToCart(product)}
+                    className="flex flex-col items-start p-2 rounded-lg border border-muted-foreground/20 hover:border-primary hover:bg-accent transition-all text-left text-xs"
+                  >
+                    <p className="font-medium truncate w-full">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(product.sellingPrice)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Stock: {product.stock}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <Card className="mb-4">
+                <CardContent className="p-4 text-center text-muted-foreground text-sm">
+                  No products in this category
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Cart Items */}
         <Card className="flex-1 min-h-0 flex flex-col">
@@ -381,30 +522,30 @@ export function POSContent() {
       </div>
 
       {/* Right Panel - Order Summary */}
-      <Card className="w-full lg:w-[380px] flex flex-col">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Order Summary</CardTitle>
+      <Card className="w-full lg:w-80 flex flex-col">
+        <CardHeader className="pb-2 md:pb-3">
+          <CardTitle className="text-base md:text-lg">Order Summary</CardTitle>
         </CardHeader>
         <Separator />
-        <CardContent className="flex-1 flex flex-col p-4 gap-4">
+        <CardContent className="flex-1 flex flex-col p-3 md:p-4 gap-3 md:gap-4">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs md:text-sm">
               <span className="text-muted-foreground">Subtotal</span>
               <span>{formatCurrency(totalAmount)}</span>
             </div>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-xs md:text-sm">
               <span className="text-muted-foreground">Discount</span>
               <Input
                 type="number"
                 value={discount || ""}
                 onChange={(e) => setDiscount(Number(e.target.value) || 0)}
-                className="w-32 h-8 text-right text-sm"
+                className="w-24 md:w-32 h-7 md:h-8 text-right text-xs md:text-sm"
                 min={0}
                 max={totalAmount}
               />
             </div>
             <Separator />
-            <div className="flex justify-between text-lg font-bold">
+            <div className="flex justify-between text-base md:text-lg font-bold">
               <span>Grand Total</span>
               <span className="text-primary">
                 {formatCurrency(grandTotal)}
@@ -414,8 +555,8 @@ export function POSContent() {
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Payment Method</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <Label className="text-xs md:text-sm font-medium">Payment Method</Label>
+            <div className="grid grid-cols-3 gap-1 md:gap-2">
               {[
                 { value: "CASH", label: "Cash", icon: Banknote },
                 { value: "TRANSFER", label: "Transfer", icon: CreditCard },
@@ -425,7 +566,7 @@ export function POSContent() {
                   key={value}
                   type="button"
                   variant={paymentMethod === value ? "default" : "outline"}
-                  className="flex flex-col gap-1 h-auto py-3"
+                  className="flex flex-col gap-1 h-auto py-2 md:py-3 text-xs"
                   onClick={() => {
                     setPaymentMethod(value as "CASH" | "TRANSFER" | "QRIS");
                     if (value !== "CASH") {
@@ -433,7 +574,7 @@ export function POSContent() {
                     }
                   }}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="text-xs">{label}</span>
                 </Button>
               ))}

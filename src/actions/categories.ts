@@ -56,7 +56,7 @@ export async function getCategoryById(id: string) {
 export async function createCategory(data: unknown) {
   const validated = categorySchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   try {
@@ -76,7 +76,7 @@ export async function createCategory(data: unknown) {
 export async function updateCategory(id: string, data: unknown) {
   const validated = categorySchema.safeParse(data);
   if (!validated.success) {
-    return { error: validated.error.errors[0].message };
+    return { error: validated.error.issues[0]?.message || "Validation failed" };
   }
 
   try {

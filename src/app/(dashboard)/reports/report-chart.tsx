@@ -28,7 +28,7 @@ export function ReportChart({ data }: ReportChartProps) {
   }));
 
   return (
-    <div className="h-[250px] w-full">
+    <div className="h-62.5 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -52,8 +52,8 @@ export function ReportChart({ data }: ReportChartProps) {
               borderRadius: "8px",
               fontSize: "12px",
             }}
-            formatter={(value: number, name: string) => [
-              name === "revenue"
+            formatter={((value: number | undefined, name: string) => [
+              typeof value === 'number' && name === "revenue"
                 ? new Intl.NumberFormat("id-ID", {
                     style: "currency",
                     currency: "IDR",
@@ -61,7 +61,7 @@ export function ReportChart({ data }: ReportChartProps) {
                   }).format(value)
                 : value,
               name === "revenue" ? "Revenue" : "Qty Sold",
-            ]}
+            ]) as any}
           />
           <Bar
             dataKey="quantity"
