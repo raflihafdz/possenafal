@@ -1,9 +1,5 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
-  "outputDirectory": ".next",
-  "env": {
-    "DATABASE_URL": "@database_url"
-  },
-  "envPrefix": "NEXT_PUBLIC_"
+  "outputDirectory": ".next"
 }
