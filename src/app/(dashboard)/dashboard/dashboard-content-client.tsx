@@ -27,37 +27,37 @@ export function DashboardContentClient({
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back! Here&apos;s your business overview.
+          Selamat datang! Berikut ringkasan bisnis Anda.
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Today's Revenue"
+          title="Pendapatan Hari Ini"
           value={formatCurrency(stats.todayRevenue)}
-          description="Total sales today"
+          description="Total penjualan hari ini"
           icon={DollarSign}
           iconClassName="bg-gradient-to-br from-blue-500 to-blue-600"
         />
         <StatsCard
-          title="Monthly Revenue"
+          title="Pendapatan Bulanan"
           value={formatCurrency(stats.monthRevenue)}
-          description="Total sales this month"
+          description="Total penjualan bulan ini"
           icon={DollarSign}
           iconClassName="bg-gradient-to-br from-emerald-500 to-emerald-600"
         />
         <StatsCard
-          title="Today's Transactions"
+          title="Transaksi Hari Ini"
           value={stats.todayTransactions}
-          description="Completed transactions"
+          description="Transaksi selesai"
           icon={ShoppingCart}
           iconClassName="bg-gradient-to-br from-violet-500 to-violet-600"
         />
         <StatsCard
-          title="Total Products"
+          title="Total Produk"
           value={stats.totalProducts}
-          description={`${stats.lowStockProducts} low stock`}
+          description={`${stats.lowStockProducts} stok menipis`}
           icon={Package}
           iconClassName="bg-gradient-to-br from-amber-500 to-orange-500"
         />
@@ -68,7 +68,7 @@ export function DashboardContentClient({
         {/* Sales Chart */}
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="text-lg">Sales Overview</CardTitle>
+            <CardTitle className="text-lg">Grafik Penjualan</CardTitle>
           </CardHeader>
           <CardContent>
             <SalesChart data={chartData} />
@@ -78,13 +78,13 @@ export function DashboardContentClient({
         {/* Top Selling Products */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-lg">Top Selling Products</CardTitle>
+            <CardTitle className="text-lg">Produk Terlaris</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {stats.topProducts.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No sales data yet
+                  Belum ada data penjualan
                 </p>
               ) : (
                 stats.topProducts.map((product: any, index: number) => (
@@ -100,7 +100,7 @@ export function DashboardContentClient({
                         {product.productName}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {product._sum.quantity} sold •{" "}
+                        {product._sum.quantity} terjual •{" "}
                         {formatCurrency(product._sum.subtotal || 0)}
                       </p>
                     </div>
@@ -117,13 +117,13 @@ export function DashboardContentClient({
         {/* Recent Transactions */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Recent Transactions</CardTitle>
+            <CardTitle className="text-lg">Transaksi Terbaru</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {stats.recentTransactions.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  No transactions yet
+                  Belum ada transaksi
                 </p>
               ) : (
                 stats.recentTransactions.map((tx: any) => (
@@ -164,19 +164,19 @@ export function DashboardContentClient({
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              <CardTitle className="text-lg">Low Stock Alert</CardTitle>
+              <CardTitle className="text-lg">Peringatan Stok Menipis</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {stats.lowStockProducts === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
-                  All products are well stocked
+                  Semua produk memiliki stok yang cukup
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  {stats.lowStockProducts} product(s) are running low on stock.
-                  Check the Products page for details.
+                  {stats.lowStockProducts} produk hampir kehabisan stok.
+                  Periksa halaman Produk untuk detailnya.
                 </p>
               )}
             </div>

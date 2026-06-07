@@ -73,7 +73,7 @@ export function TransactionsContent() {
       setTransactions(result.transactions as Transaction[]);
       setTotalPages(result.totalPages);
     } catch {
-      toast.error("Failed to load transactions");
+      toast.error("Gagal memuat transaksi");
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +89,7 @@ export function TransactionsContent() {
       setSelectedTransaction(tx as TransactionDetail | null);
       setDetailDialogOpen(true);
     } catch {
-      toast.error("Failed to load transaction");
+      toast.error("Gagal memuat transaksi");
     }
   };
 
@@ -105,14 +105,14 @@ export function TransactionsContent() {
     },
     {
       accessorKey: "createdAt",
-      header: "Date",
+      header: "Tanggal",
       cell: ({ row }) => (
         <span className="text-sm">{formatDate(row.original.createdAt)}</span>
       ),
     },
     {
       accessorKey: "user.name",
-      header: "Cashier",
+      header: "Kasir",
       cell: ({ row }) => (
         <span className="text-sm">{row.original.user.name}</span>
       ),
@@ -128,7 +128,7 @@ export function TransactionsContent() {
     },
     {
       accessorKey: "paymentMethod",
-      header: "Payment",
+      header: "Pembayaran",
       cell: ({ row }) => (
         <Badge variant="secondary">{row.original.paymentMethod}</Badge>
       ),
@@ -141,13 +141,13 @@ export function TransactionsContent() {
           variant={row.original.status === "COMPLETED" ? "default" : "destructive"}
           className={row.original.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" : ""}
         >
-          {row.original.status}
+          {row.original.status === "COMPLETED" ? "Selesai" : "Dibatalkan"}
         </Badge>
       ),
     },
     {
       id: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewDetail(row.original.id)}>
@@ -166,8 +166,8 @@ export function TransactionsContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-        <p className="text-muted-foreground">View and manage transaction history</p>
+        <h1 className="text-3xl font-bold tracking-tight">Transaksi</h1>
+        <p className="text-muted-foreground">Lihat dan kelola riwayat transaksi</p>
       </div>
 
       {/* Filters */}
@@ -175,7 +175,7 @@ export function TransactionsContent() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search invoice..."
+            placeholder="Cari invoice..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="pl-9"
@@ -183,18 +183,18 @@ export function TransactionsContent() {
         </div>
         <Select value={statusFilter} onValueChange={(val: string | null) => { setStatusFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Status" />
+            <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="COMPLETED">Completed</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="COMPLETED">Selesai</SelectItem>
+            <SelectItem value="CANCELLED">Dibatalkan</SelectItem>
           </SelectContent>
         </Select>
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <Input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setPage(1); }} className="w-40" />
-          <span className="text-muted-foreground">to</span>
+          <span className="text-muted-foreground">s/d</span>
           <Input type="date" value={endDate} onChange={(e) => { setEndDate(e.target.value); setPage(1); }} className="w-40" />
         </div>
       </div>
@@ -205,7 +205,7 @@ export function TransactionsContent() {
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Transaction Detail</DialogTitle>
+            <DialogTitle>Detail Transaksi</DialogTitle>
           </DialogHeader>
           {selectedTransaction && (
             <div className="space-y-4">
@@ -215,15 +215,15 @@ export function TransactionsContent() {
                   <p className="font-mono font-medium">{selectedTransaction.invoiceNumber}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Date</p>
+                  <p className="text-xs text-muted-foreground">Tanggal</p>
                   <p>{formatDate(selectedTransaction.createdAt)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Cashier</p>
+                  <p className="text-xs text-muted-foreground">Kasir</p>
                   <p>{selectedTransaction.user.name}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Payment</p>
+                  <p className="text-xs text-muted-foreground">Pembayaran</p>
                   <Badge variant="secondary">{selectedTransaction.paymentMethod}</Badge>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export function TransactionsContent() {
               <Separator />
 
               <div className="space-y-2">
-                <p className="font-semibold text-sm">Items</p>
+                <p className="font-semibold text-sm">Item</p>
                 {selectedTransaction.items.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm rounded-lg border p-2">
                     <div>
@@ -254,7 +254,7 @@ export function TransactionsContent() {
                 </div>
                 {selectedTransaction.discount > 0 && (
                   <div className="flex justify-between text-destructive">
-                    <span>Discount</span>
+                    <span>Diskon</span>
                     <span>-{formatCurrency(selectedTransaction.discount)}</span>
                   </div>
                 )}
@@ -264,12 +264,12 @@ export function TransactionsContent() {
                   <span className="text-primary">{formatCurrency(selectedTransaction.grandTotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Paid</span>
+                  <span className="text-muted-foreground">Dibayar</span>
                   <span>{formatCurrency(selectedTransaction.paidAmount)}</span>
                 </div>
                 {selectedTransaction.changeAmount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Change</span>
+                    <span>Kembalian</span>
                     <span>{formatCurrency(selectedTransaction.changeAmount)}</span>
                   </div>
                 )}

@@ -53,7 +53,7 @@ export function ReceiptDialog({ open, onOpenChange, invoiceNumber }: ReceiptDial
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Transaction Complete!</DialogTitle>
+          <DialogTitle className="text-center">Transaksi Berhasil!</DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
@@ -72,7 +72,7 @@ export function ReceiptDialog({ open, onOpenChange, invoiceNumber }: ReceiptDial
                 className="rounded-lg"
               />
               <p className="text-xs text-muted-foreground text-center">
-                Show this QR code to customer for digital receipt
+                Tunjukkan kode QR ini ke pelanggan untuk struk digital
               </p>
             </div>
 
@@ -83,8 +83,8 @@ export function ReceiptDialog({ open, onOpenChange, invoiceNumber }: ReceiptDial
                 <span className="font-mono font-medium">{transaction.invoiceNumber}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Items</span>
-                <span>{transaction.items.length} products</span>
+                <span className="text-muted-foreground">Item</span>
+                <span>{transaction.items.length} produk</span>
               </div>
               <div className="flex justify-between font-bold text-lg">
                 <span>Grand Total</span>
@@ -93,11 +93,11 @@ export function ReceiptDialog({ open, onOpenChange, invoiceNumber }: ReceiptDial
               {transaction.paymentMethod === "CASH" && (
                 <>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Paid</span>
+                    <span className="text-muted-foreground">Dibayar</span>
                     <span>{formatCurrency(transaction.paidAmount)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-emerald-600 font-semibold">
-                    <span>Change</span>
+                    <span>Kembalian</span>
                     <span>{formatCurrency(transaction.changeAmount)}</span>
                   </div>
                 </>
@@ -106,19 +106,19 @@ export function ReceiptDialog({ open, onOpenChange, invoiceNumber }: ReceiptDial
 
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
-                Close
+                Tutup
               </Button>
               <Link href={`/receipt/${invoiceNumber}`} target="_blank" className="flex-1">
                 <Button className="w-full gap-2">
                   <ExternalLink className="h-4 w-4" />
-                  View Receipt
+                  Lihat Struk
                 </Button>
               </Link>
             </div>
           </div>
         ) : (
           <p className="text-center text-muted-foreground py-4">
-            Receipt not found
+            Struk tidak ditemukan
           </p>
         )}
       </DialogContent>

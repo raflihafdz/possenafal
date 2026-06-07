@@ -106,7 +106,7 @@ export function ProductsContent() {
       setProducts(result.products as Product[]);
       setTotalPages(result.totalPages);
     } catch {
-      toast.error("Failed to load products");
+      toast.error("Gagal memuat produk");
     } finally {
       setIsLoading(false);
     }
@@ -165,11 +165,11 @@ export function ProductsContent() {
         return;
       }
 
-      toast.success(editingProduct ? "Product updated!" : "Product created!");
+      toast.success(editingProduct ? "Produk diperbarui!" : "Produk ditambahkan!");
       setDialogOpen(false);
       fetchProducts();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Terjadi kesalahan");
     }
   };
 
@@ -181,11 +181,11 @@ export function ProductsContent() {
         toast.error(result.error);
         return;
       }
-      toast.success("Product deleted!");
+      toast.success("Produk dihapus!");
       setDeleteDialogOpen(false);
       fetchProducts();
     } catch {
-      toast.error("Failed to delete product");
+      toast.error("Gagal menghapus produk");
     }
   };
 
@@ -196,24 +196,24 @@ export function ProductsContent() {
         toast.error(result.error);
         return;
       }
-      toast.success("Status updated!");
+      toast.success("Status diperbarui!");
       fetchProducts();
     } catch {
-      toast.error("Failed to update status");
+      toast.error("Gagal memperbarui status");
     }
   };
 
   const columns: ColumnDef<Product>[] = [
     {
       accessorKey: "code",
-      header: "Code",
+      header: "Kode",
       cell: ({ row }) => (
         <span className="font-mono text-xs">{row.original.code}</span>
       ),
     },
     {
       accessorKey: "name",
-      header: "Product",
+      header: "Produk",
       cell: ({ row }) => (
         <div>
           <p className="font-medium">{row.original.name}</p>
@@ -225,7 +225,7 @@ export function ProductsContent() {
     },
     {
       accessorKey: "sellingPrice",
-      header: "Price",
+      header: "Harga",
       cell: ({ row }) => (
         <span className="font-medium">
           {formatCurrency(row.original.sellingPrice)}
@@ -234,7 +234,7 @@ export function ProductsContent() {
     },
     {
       accessorKey: "stock",
-      header: "Stock",
+      header: "Stok",
       cell: ({ row }) => {
         const { stock, minStock } = row.original;
         const isLow = stock <= minStock;
@@ -246,13 +246,13 @@ export function ProductsContent() {
             </span>
             {isOut && (
               <Badge variant="destructive" className="text-[10px]">
-                Out
+                Habis
               </Badge>
             )}
             {!isOut && isLow && (
               <Badge className="text-[10px] bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
                 <AlertTriangle className="h-3 w-3 mr-1" />
-                Low
+                Menipis
               </Badge>
             )}
           </div>
@@ -267,13 +267,13 @@ export function ProductsContent() {
           variant={row.original.isActive ? "default" : "secondary"}
           className={row.original.isActive ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" : ""}
         >
-          {row.original.isActive ? "Active" : "Inactive"}
+          {row.original.isActive ? "Aktif" : "Tidak Aktif"}
         </Badge>
       ),
     },
     {
       id: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(row.original)} className="h-8 w-8">
@@ -299,12 +299,12 @@ export function ProductsContent() {
     <div className="space-y-4 md:space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Products</h1>
-          <p className="text-xs md:text-sm text-muted-foreground">Manage your product inventory</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Produk</h1>
+          <p className="text-xs md:text-sm text-muted-foreground">Kelola inventaris produk Anda</p>
         </div>
         <Button onClick={handleOpenCreate} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
-          Add Product
+          Tambah Produk
         </Button>
       </div>
 
@@ -313,7 +313,7 @@ export function ProductsContent() {
         <div className="relative flex-1 min-w-50 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search products..."
+            placeholder="Cari produk..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="pl-9"
@@ -321,10 +321,10 @@ export function ProductsContent() {
         </div>
         <Select value={categoryFilter} onValueChange={(val: string | null) => { setCategoryFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
           <SelectTrigger className="w-50">
-            <SelectValue placeholder="All Categories" />
+            <SelectValue placeholder="Semua Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">Semua Kategori</SelectItem>
             {categories.map((cat) => (
               <SelectItem key={cat.id} value={cat.id}>
                 {cat.name}
@@ -340,27 +340,27 @@ export function ProductsContent() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md md:max-w-2xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
           <DialogHeader>
-            <DialogTitle className="text-lg md:text-xl">{editingProduct ? "Edit Product" : "Create Product"}</DialogTitle>
+            <DialogTitle className="text-lg md:text-xl">{editingProduct ? "Edit Produk" : "Tambah Produk"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs md:text-sm">Product Code</Label>
+                <Label className="text-xs md:text-sm">Kode Produk</Label>
                 <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} placeholder="PRD-001" required className="text-sm" />
               </div>
               <div className="space-y-2">
                 <Label>Barcode</Label>
-                <Input value={formData.barcode} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} placeholder="Optional" />
+                <Input value={formData.barcode} onChange={(e) => setFormData({ ...formData, barcode: e.target.value })} placeholder="Opsional" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Product Name</Label>
-              <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Product name" required />
+              <Label>Nama Produk</Label>
+              <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nama produk" required />
             </div>
             <div className="space-y-2">
-              <Label>Category</Label>
+              <Label>Kategori</Label>
               <Select value={formData.categoryId || ""} onValueChange={(val: string | null) => setFormData({ ...formData, categoryId: val || "" })}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
@@ -369,36 +369,36 @@ export function ProductsContent() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Description</Label>
-              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Optional" rows={2} />
+              <Label>Deskripsi</Label>
+              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Opsional" rows={2} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Purchase Price</Label>
+                <Label>Harga Beli</Label>
                 <Input type="number" value={formData.purchasePrice} onChange={(e) => setFormData({ ...formData, purchasePrice: Number(e.target.value) })} min={0} required />
               </div>
               <div className="space-y-2">
-                <Label>Selling Price</Label>
+                <Label>Harga Jual</Label>
                 <Input type="number" value={formData.sellingPrice} onChange={(e) => setFormData({ ...formData, sellingPrice: Number(e.target.value) })} min={0} required />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Stock</Label>
+                <Label>Stok</Label>
                 <Input type="number" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })} min={0} required />
               </div>
               <div className="space-y-2">
-                <Label>Min Stock</Label>
+                <Label>Stok Minimum</Label>
                 <Input type="number" value={formData.minStock} onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) })} min={0} required />
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={formData.isActive} onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })} />
-              <Label>Active</Label>
+              <Label>Aktif</Label>
             </div>
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">{editingProduct ? "Update" : "Create"}</Button>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
+              <Button type="submit">{editingProduct ? "Perbarui" : "Simpan"}</Button>
             </div>
           </form>
         </DialogContent>
@@ -408,12 +408,12 @@ export function ProductsContent() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
-            <AlertDialogDescription>Are you sure? This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>Hapus Produk</AlertDialogTitle>
+            <AlertDialogDescription>Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

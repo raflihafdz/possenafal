@@ -88,7 +88,7 @@ export function StockContent() {
       setMovements(result.movements as StockMovement[]);
       setTotalPages(result.totalPages);
     } catch {
-      toast.error("Failed to load stock movements");
+      toast.error("Gagal memuat pergerakan stok");
     } finally {
       setIsLoading(false);
     }
@@ -119,13 +119,13 @@ export function StockContent() {
         toast.error(result.error);
         return;
       }
-      toast.success("Stock movement created!");
+      toast.success("Pergerakan stok berhasil dicatat!");
       setDialogOpen(false);
       setFormData({ productId: "", type: "IN", quantity: 1, notes: "" });
       fetchMovements();
       fetchLowStock();
     } catch {
-      toast.error("Failed to create stock movement");
+      toast.error("Gagal mencatat pergerakan stok");
     }
   };
 
@@ -157,12 +157,12 @@ export function StockContent() {
   const movementColumns: ColumnDef<StockMovement>[] = [
     {
       accessorKey: "createdAt",
-      header: "Date",
+      header: "Tanggal",
       cell: ({ row }) => <span className="text-sm">{formatDate(row.original.createdAt)}</span>,
     },
     {
       accessorKey: "product.name",
-      header: "Product",
+      header: "Produk",
       cell: ({ row }) => (
         <div>
           <p className="font-medium">{row.original.product.name}</p>
@@ -172,12 +172,12 @@ export function StockContent() {
     },
     {
       accessorKey: "type",
-      header: "Type",
+      header: "Tipe",
       cell: ({ row }) => getTypeBadge(row.original.type),
     },
     {
       accessorKey: "quantity",
-      header: "Qty",
+      header: "Jml",
       cell: ({ row }) => {
         const { type, quantity } = row.original;
         return (
@@ -190,7 +190,7 @@ export function StockContent() {
     },
     {
       id: "stockChange",
-      header: "Stock Change",
+      header: "Perubahan Stok",
       cell: ({ row }) => (
         <span className="text-sm">
           {row.original.stockBefore} → {row.original.stockAfter}
@@ -199,12 +199,12 @@ export function StockContent() {
     },
     {
       accessorKey: "user.name",
-      header: "User",
+      header: "Pengguna",
       cell: ({ row }) => <span className="text-sm">{row.original.user.name}</span>,
     },
     {
       accessorKey: "notes",
-      header: "Notes",
+      header: "Catatan",
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground truncate max-w-50 block">
           {row.original.notes || "-"}
@@ -217,21 +217,21 @@ export function StockContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Stock Management</h1>
-          <p className="text-muted-foreground">Track and manage inventory movements</p>
+          <h1 className="text-3xl font-bold tracking-tight">Manajemen Stok</h1>
+          <p className="text-muted-foreground">Lacak dan kelola pergerakan inventaris</p>
         </div>
         <Button onClick={() => setDialogOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
-          Stock Movement
+          Catat Pergerakan Stok
         </Button>
       </div>
 
       <Tabs defaultValue="movements">
         <TabsList>
-          <TabsTrigger value="movements">Movement History</TabsTrigger>
+          <TabsTrigger value="movements">Riwayat Pergerakan</TabsTrigger>
           <TabsTrigger value="lowstock" className="gap-1">
             <AlertTriangle className="h-3 w-3" />
-            Low Stock ({lowStockProducts.length})
+            Stok Menipis ({lowStockProducts.length})
           </TabsTrigger>
         </TabsList>
 
@@ -240,7 +240,7 @@ export function StockContent() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search product..."
+                placeholder="Cari produk..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 className="pl-9"
@@ -248,14 +248,14 @@ export function StockContent() {
             </div>
             <Select value={typeFilter} onValueChange={(val: string | null) => { setTypeFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="All Types" />
+                <SelectValue placeholder="Semua Tipe" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="IN">Stock In</SelectItem>
-                <SelectItem value="OUT">Stock Out</SelectItem>
-                <SelectItem value="ADJUSTMENT">Adjustment</SelectItem>
-                <SelectItem value="SALE">Sale</SelectItem>
+                <SelectItem value="all">Semua Tipe</SelectItem>
+                <SelectItem value="IN">Stok Masuk</SelectItem>
+                <SelectItem value="OUT">Stok Keluar</SelectItem>
+                <SelectItem value="ADJUSTMENT">Penyesuaian</SelectItem>
+                <SelectItem value="SALE">Penjualan</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -267,7 +267,7 @@ export function StockContent() {
           {lowStockProducts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                All products are well stocked!
+                Semua produk memiliki stok yang cukup!
               </CardContent>
             </Card>
           ) : (
@@ -278,23 +278,23 @@ export function StockContent() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-medium">{product.name}</CardTitle>
                       {product.stock === 0 ? (
-                        <Badge variant="destructive">Out of Stock</Badge>
+                        <Badge variant="destructive">Stok Habis</Badge>
                       ) : (
-                        <Badge className="bg-amber-500/10 text-amber-600">Low Stock</Badge>
+                        <Badge className="bg-amber-500/10 text-amber-600">Stok Menipis</Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Current / Min</span>
+                      <span className="text-muted-foreground">Saat ini / Min</span>
                       <span className="font-semibold">{product.stock} / {product.minStock}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
-                      <span className="text-muted-foreground">Category</span>
+                      <span className="text-muted-foreground">Kategori</span>
                       <span>{product.category.name}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
-                      <span className="text-muted-foreground">Price</span>
+                      <span className="text-muted-foreground">Harga</span>
                       <span>{formatCurrency(product.sellingPrice)}</span>
                     </div>
                   </CardContent>
@@ -309,44 +309,44 @@ export function StockContent() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Stock Movement</DialogTitle>
+            <DialogTitle>Catat Pergerakan Stok</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label>Product</Label>
+              <Label>Produk</Label>
               <Select value={formData.productId || ""} onValueChange={(val: string | null) => setFormData({ ...formData, productId: val || "" })}>
-                <SelectTrigger><SelectValue placeholder="Select product" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Pilih produk" /></SelectTrigger>
                 <SelectContent>
                   {products.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.name} (Stock: {p.stock})
+                      {p.name} (Stok: {p.stock})
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Movement Type</Label>
+              <Label>Tipe Pergerakan</Label>
               <Select value={formData.type} onValueChange={(val) => setFormData({ ...formData, type: val as "IN" | "OUT" | "ADJUSTMENT" })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="IN">Stock In</SelectItem>
-                  <SelectItem value="OUT">Stock Out</SelectItem>
-                  <SelectItem value="ADJUSTMENT">Stock Adjustment (Set to)</SelectItem>
+                  <SelectItem value="IN">Stok Masuk</SelectItem>
+                  <SelectItem value="OUT">Stok Keluar</SelectItem>
+                  <SelectItem value="ADJUSTMENT">Penyesuaian Stok (Atur ke)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>{formData.type === "ADJUSTMENT" ? "New Stock Value" : "Quantity"}</Label>
+              <Label>{formData.type === "ADJUSTMENT" ? "Nilai Stok Baru" : "Jumlah"}</Label>
               <Input type="number" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })} min={formData.type === "ADJUSTMENT" ? 0 : 1} required />
             </div>
             <div className="space-y-2">
-              <Label>Notes</Label>
-              <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Reason for stock movement..." rows={2} />
+              <Label>Catatan</Label>
+              <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Alasan pergerakan stok..." rows={2} />
             </div>
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Create Movement</Button>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Batal</Button>
+              <Button type="submit">Catat Pergerakan</Button>
             </div>
           </form>
         </DialogContent>

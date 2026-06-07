@@ -68,7 +68,7 @@ export function CategoriesContent() {
       setCategories(result.categories as Category[]);
       setTotalPages(result.totalPages);
     } catch {
-      toast.error("Failed to load categories");
+      toast.error("Gagal memuat kategori");
     } finally {
       setIsLoading(false);
     }
@@ -107,12 +107,12 @@ export function CategoriesContent() {
       }
 
       toast.success(
-        editingCategory ? "Category updated!" : "Category created!"
+        editingCategory ? "Kategori diperbarui!" : "Kategori ditambahkan!"
       );
       setDialogOpen(false);
       fetchCategories();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Terjadi kesalahan");
     }
   };
 
@@ -124,11 +124,11 @@ export function CategoriesContent() {
         toast.error(result.error);
         return;
       }
-      toast.success("Category deleted!");
+      toast.success("Kategori dihapus!");
       setDeleteDialogOpen(false);
       fetchCategories();
     } catch {
-      toast.error("Failed to delete category");
+      toast.error("Gagal menghapus kategori");
     }
   };
 
@@ -139,24 +139,24 @@ export function CategoriesContent() {
         toast.error(result.error);
         return;
       }
-      toast.success("Status updated!");
+      toast.success("Status diperbarui!");
       fetchCategories();
     } catch {
-      toast.error("Failed to update status");
+      toast.error("Gagal memperbarui status");
     }
   };
 
   const columns: ColumnDef<Category>[] = [
     {
       accessorKey: "name",
-      header: "Name",
+      header: "Nama",
       cell: ({ row }) => (
         <span className="font-medium">{row.original.name}</span>
       ),
     },
     {
       accessorKey: "description",
-      header: "Description",
+      header: "Deskripsi",
       cell: ({ row }) => (
         <span className="text-muted-foreground text-sm">
           {row.original.description || "-"}
@@ -165,7 +165,7 @@ export function CategoriesContent() {
     },
     {
       accessorKey: "_count.products",
-      header: "Products",
+      header: "Produk",
       cell: ({ row }) => (
         <Badge variant="secondary">{row.original._count.products}</Badge>
       ),
@@ -178,13 +178,13 @@ export function CategoriesContent() {
           variant={row.original.isActive ? "default" : "secondary"}
           className={row.original.isActive ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20" : ""}
         >
-          {row.original.isActive ? "Active" : "Inactive"}
+          {row.original.isActive ? "Aktif" : "Tidak Aktif"}
         </Badge>
       ),
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
+      header: "Dibuat",
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
           {formatDate(row.original.createdAt)}
@@ -193,7 +193,7 @@ export function CategoriesContent() {
     },
     {
       id: "actions",
-      header: "Actions",
+      header: "Aksi",
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Button
@@ -236,12 +236,12 @@ export function CategoriesContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
-          <p className="text-muted-foreground">Manage product categories</p>
+          <h1 className="text-3xl font-bold tracking-tight">Kategori</h1>
+          <p className="text-muted-foreground">Kelola kategori produk</p>
         </div>
         <Button onClick={handleOpenCreate} className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Category
+          Tambah Kategori
         </Button>
       </div>
 
@@ -250,7 +250,7 @@ export function CategoriesContent() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search categories..."
+            placeholder="Cari kategori..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -276,31 +276,31 @@ export function CategoriesContent() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingCategory ? "Edit Category" : "Create Category"}
+              {editingCategory ? "Edit Kategori" : "Tambah Kategori"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nama</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Category name"
+                placeholder="Nama kategori"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Deskripsi</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Category description (optional)"
+                placeholder="Deskripsi kategori (opsional)"
                 rows={3}
               />
             </div>
@@ -311,7 +311,7 @@ export function CategoriesContent() {
                   setFormData({ ...formData, isActive: checked })
                 }
               />
-              <Label>Active</Label>
+              <Label>Aktif</Label>
             </div>
             <div className="flex justify-end gap-2">
               <Button
@@ -319,10 +319,10 @@ export function CategoriesContent() {
                 variant="outline"
                 onClick={() => setDialogOpen(false)}
               >
-                Cancel
+                Batal
               </Button>
               <Button type="submit">
-                {editingCategory ? "Update" : "Create"}
+                {editingCategory ? "Perbarui" : "Simpan"}
               </Button>
             </div>
           </form>
@@ -333,19 +333,19 @@ export function CategoriesContent() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Kategori</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this category? This action cannot
-              be undone.
+              Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak
+              dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              Hapus
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

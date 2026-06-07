@@ -62,7 +62,7 @@ export function ReportsContent() {
       });
       setData(result as ReportData);
     } catch {
-      toast.error("Failed to load reports");
+      toast.error("Gagal memuat laporan");
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +107,7 @@ export function ReportsContent() {
     a.download = `report-${startDate || "all"}-${endDate || "all"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Report exported successfully");
+    toast.success("Laporan berhasil diekspor");
   };
 
   // Set default dates (current month)
@@ -143,9 +143,9 @@ export function ReportsContent() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Laporan</h1>
           <p className="text-muted-foreground">
-            Sales analytics and performance reports
+            Analitik penjualan dan laporan kinerja
           </p>
         </div>
         <Button
@@ -154,7 +154,7 @@ export function ReportsContent() {
           className="gap-2"
         >
           <Download className="h-4 w-4" />
-          Export CSV
+          Ekspor CSV
         </Button>
       </div>
 
@@ -163,7 +163,7 @@ export function ReportsContent() {
         <CardContent className="pt-6">
           <div className="flex flex-wrap items-end gap-4">
             <div className="space-y-2">
-              <Label>Start Date</Label>
+              <Label>Tanggal Mulai</Label>
               <Input
                 type="date"
                 value={startDate}
@@ -172,7 +172,7 @@ export function ReportsContent() {
               />
             </div>
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>Tanggal Selesai</Label>
               <Input
                 type="date"
                 value={endDate}
@@ -182,13 +182,13 @@ export function ReportsContent() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={setToday}>
-                Today
+                Hari Ini
               </Button>
               <Button variant="outline" size="sm" onClick={setThisMonth}>
-                This Month
+                Bulan Ini
               </Button>
               <Button variant="outline" size="sm" onClick={setLastMonth}>
-                Last Month
+                Bulan Lalu
               </Button>
               <Button
                 variant="outline"
@@ -198,7 +198,7 @@ export function ReportsContent() {
                   setEndDate("");
                 }}
               >
-                All Time
+                Semua Waktu
               </Button>
             </div>
           </div>
@@ -214,25 +214,25 @@ export function ReportsContent() {
           {/* Stats Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatsCard
-              title="Total Revenue"
+              title="Total Pendapatan"
               value={formatCurrency(data.totalRevenue)}
               icon={DollarSign}
               className="border-l-4 border-l-emerald-500"
             />
             <StatsCard
-              title="Total Transactions"
+              title="Total Transaksi"
               value={data.totalTransactions}
               icon={ShoppingCart}
               className="border-l-4 border-l-blue-500"
             />
             <StatsCard
-              title="Average Transaction"
+              title="Rata-rata Transaksi"
               value={formatCurrency(data.avgTransaction)}
               icon={TrendingUp}
               className="border-l-4 border-l-violet-500"
             />
             <StatsCard
-              title="Total Discount"
+              title="Total Diskon"
               value={formatCurrency(data.totalDiscount)}
               icon={Calendar}
               className="border-l-4 border-l-amber-500"
@@ -246,14 +246,14 @@ export function ReportsContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <BarChart3 className="h-5 w-5" />
-                  Top Selling Products
+                  Produk Terlaris
                 </CardTitle>
               </CardHeader>
               <Separator />
               <CardContent className="pt-4">
                 {data.topProducts.length === 0 ? (
                   <p className="py-8 text-center text-muted-foreground">
-                    No sales data available
+                    Belum ada data penjualan
                   </p>
                 ) : (
                   <>
@@ -273,7 +273,7 @@ export function ReportsContent() {
                                 {product.productName}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {product._sum.quantity || 0} units sold
+                                {product._sum.quantity || 0} unit terjual
                               </p>
                             </div>
                           </div>
@@ -293,14 +293,14 @@ export function ReportsContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <CreditCard className="h-5 w-5" />
-                  Payment Methods
+                  Metode Pembayaran
                 </CardTitle>
               </CardHeader>
               <Separator />
               <CardContent className="pt-4">
                 {data.paymentMethods.length === 0 ? (
                   <p className="py-8 text-center text-muted-foreground">
-                    No payment data available
+                    Belum ada data pembayaran
                   </p>
                 ) : (
                   <div className="space-y-4">
