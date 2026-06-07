@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Dashboard - PossENafal POS",
-  description: "Overview of your business performance",
+  description: "Ringkasan performa bisnis Anda",
 };
 
 export default function DashboardPage() {

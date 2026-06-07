@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ProductsContent } from "./products-content";
 
 export const metadata: Metadata = {
-  title: "Products - PossENafal POS",
-  description: "Manage products and inventory",
+  title: "Produk - PossENafal POS",
+  description: "Kelola produk dan inventaris",
 };
 
 export default function ProductsPage() {

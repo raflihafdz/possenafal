@@ -33,12 +33,12 @@ export default function LoginPage() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Login successful!");
+        toast.success("Berhasil masuk!");
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Terjadi kesalahan");
     } finally {
       setIsLoading(false);
     }
@@ -54,9 +54,9 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/25">
             <Store className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold">Selamat Datang Kembali</CardTitle>
           <CardDescription>
-            Sign in to PossENafal POS System
+            Masuk ke Sistem POS PossENafal
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
@@ -77,12 +77,12 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Kata Sandi</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Masukkan kata sandi Anda"
                   {...register("password")}
                   disabled={isLoading}
                   className="h-11 pr-10"
@@ -116,17 +116,17 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Sedang masuk...
                 </>
               ) : (
-                "Sign In"
+                "Masuk"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-xs text-muted-foreground">
-              Demo: admin@possenafal.com / password123
+              Demo: admin@possenafal.com / admin123
             </p>
           </div>
         </CardContent>

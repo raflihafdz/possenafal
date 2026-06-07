@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { CategoriesContent } from "./categories-content";
 
 export const metadata: Metadata = {
-  title: "Categories - PossENafal POS",
-  description: "Manage product categories",
+  title: "Kategori - PossENafal POS",
+  description: "Kelola kategori produk",
 };
 
 export default function CategoriesPage() {

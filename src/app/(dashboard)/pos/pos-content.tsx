@@ -86,7 +86,7 @@ export function POSContent() {
           setSelectedCategoryId(result[0].id);
         }
       } catch {
-        toast.error("Failed to load categories");
+        toast.error("Gagal memuat kategori");
       } finally {
         setIsLoadingCategories(false);
       }
@@ -109,7 +109,7 @@ export function POSContent() {
         setShowResults(false);
         setCategoryProducts(result.products as SearchProduct[]);
       } catch {
-        toast.error("Failed to load products");
+        toast.error("Gagal memuat produk");
       } finally {
         setIsLoadingProducts(false);
       }
@@ -137,7 +137,7 @@ export function POSContent() {
       setSearchResults(results as SearchProduct[]);
       setShowResults(true);
     } catch {
-      toast.error("Search failed");
+      toast.error("Pencarian gagal");
     } finally {
       setIsSearching(false);
     }
@@ -183,7 +183,7 @@ export function POSContent() {
 
     if (existing) {
       if (existing.quantity >= product.stock) {
-        toast.error(`Only ${product.stock} items available`);
+        toast.error(`Hanya ${product.stock} item tersedia`);
         return;
       }
       setCart(
@@ -215,7 +215,7 @@ export function POSContent() {
     setSearchQuery("");
     setShowResults(false);
     searchRef.current?.focus();
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${product.name} ditambahkan ke keranjang`);
   };
 
   const updateQuantity = (productId: string, delta: number) => {
@@ -226,7 +226,7 @@ export function POSContent() {
           const newQty = item.quantity + delta;
           if (newQty <= 0) return item;
           if (newQty > item.maxStock) {
-            toast.error(`Only ${item.maxStock} items available`);
+            toast.error(`Hanya ${item.maxStock} item tersedia`);
             return item;
           }
           return {
@@ -251,7 +251,7 @@ export function POSContent() {
 
   const handleCheckout = async () => {
     if (paymentMethod === "CASH" && paidAmount < grandTotal) {
-      toast.error("Paid amount must be at least " + formatCurrency(grandTotal));
+      toast.error("Jumlah pembayaran harus minimal " + formatCurrency(grandTotal));
       return;
     }
 
@@ -274,7 +274,7 @@ export function POSContent() {
         return;
       }
 
-      toast.success("Transaction completed!");
+      toast.success("Transaksi berhasil!");
       setLastInvoice(result.transaction!.invoiceNumber);
       setCheckoutDialogOpen(false);
       setReceiptDialogOpen(true);
@@ -289,7 +289,7 @@ export function POSContent() {
         setCategoryProducts(reloadedProducts.products as SearchProduct[]);
       }
     } catch {
-      toast.error("Transaction failed");
+      toast.error("Transaksi gagal");
     } finally {
       setIsCheckingOut(false);
     }
@@ -302,11 +302,11 @@ export function POSContent() {
       {/* Left Panel - Product Search */}
       <div className="flex-1 flex flex-col min-h-0 min-w-0">
         <div className="mb-2 md:mb-4">
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">POS Cashier</h1>
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Kasir POS</h1>
           <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
-            Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F2</kbd> to search
+            Tekan <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F2</kbd> untuk mencari
             {" • "}
-            <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F9</kbd> to checkout
+            <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F9</kbd> untuk checkout
           </p>
         </div>
 
@@ -316,7 +316,7 @@ export function POSContent() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 md:h-5 md:w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
               ref={searchRef}
-              placeholder="Search products..."
+              placeholder="Cari produk..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 md:pl-11 h-10 md:h-12 text-sm md:text-base"
@@ -359,7 +359,7 @@ export function POSContent() {
           {showResults && searchResults.length === 0 && searchQuery.length > 0 && !isSearching && (
             <Card className="absolute z-50 w-full mt-1 shadow-lg">
               <CardContent className="p-6 text-center text-muted-foreground">
-                No products found
+                Produk tidak ditemukan
               </CardContent>
             </Card>
           )}
@@ -368,7 +368,7 @@ export function POSContent() {
         {/* Category Selection */}
         {!searchQuery && (
           <div className="mb-4">
-            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Categories</h3>
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Kategori</h3>
             {isLoadingCategories ? (
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {[1, 2, 3, 4].map((i) => (
@@ -402,7 +402,7 @@ export function POSContent() {
         {!searchQuery && selectedCategoryId && (
           <div className="mb-4">
             <h3 className="text-sm font-semibold mb-3 text-muted-foreground">
-              Products {isLoadingProducts && "• Loading..."}
+              Produk {isLoadingProducts && "• Memuat..."}
             </h3>
             {isLoadingProducts ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
@@ -426,7 +426,7 @@ export function POSContent() {
                       {formatCurrency(product.sellingPrice)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Stock: {product.stock}
+                      Stok: {product.stock}
                     </p>
                   </button>
                 ))}
@@ -434,7 +434,7 @@ export function POSContent() {
             ) : (
               <Card className="mb-4">
                 <CardContent className="p-4 text-center text-muted-foreground text-sm">
-                  No products in this category
+                  Tidak ada produk di kategori ini
                 </CardContent>
               </Card>
             )}
@@ -447,11 +447,11 @@ export function POSContent() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <ShoppingCart className="h-5 w-5" />
-                Cart ({cart.length} items)
+                Keranjang ({cart.length} item)
               </CardTitle>
               {cart.length > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearCart} className="text-destructive hover:text-destructive">
-                  <X className="h-4 w-4 mr-1" /> Clear
+                  <X className="h-4 w-4 mr-1" /> Bersihkan
                 </Button>
               )}
             </div>
@@ -463,7 +463,7 @@ export function POSContent() {
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <ShoppingCart className="h-12 w-12 text-muted-foreground/30" />
                   <p className="mt-4 text-muted-foreground">
-                    Cart is empty. Search and add products.
+                    Keranjang kosong. Cari dan tambahkan produk.
                   </p>
                 </div>
               ) : (
@@ -524,7 +524,7 @@ export function POSContent() {
       {/* Right Panel - Order Summary */}
       <Card className="w-full lg:w-80 flex flex-col">
         <CardHeader className="pb-2 md:pb-3">
-          <CardTitle className="text-base md:text-lg">Order Summary</CardTitle>
+          <CardTitle className="text-base md:text-lg">Ringkasan Pesanan</CardTitle>
         </CardHeader>
         <Separator />
         <CardContent className="flex-1 flex flex-col p-3 md:p-4 gap-3 md:gap-4">
@@ -534,7 +534,7 @@ export function POSContent() {
               <span>{formatCurrency(totalAmount)}</span>
             </div>
             <div className="flex items-center justify-between text-xs md:text-sm">
-              <span className="text-muted-foreground">Discount</span>
+              <span className="text-muted-foreground">Diskon</span>
               <Input
                 type="number"
                 value={discount || ""}
@@ -546,7 +546,7 @@ export function POSContent() {
             </div>
             <Separator />
             <div className="flex justify-between text-base md:text-lg font-bold">
-              <span>Grand Total</span>
+              <span>Total Akhir</span>
               <span className="text-primary">
                 {formatCurrency(grandTotal)}
               </span>
@@ -555,10 +555,10 @@ export function POSContent() {
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label className="text-xs md:text-sm font-medium">Payment Method</Label>
+            <Label className="text-xs md:text-sm font-medium">Metode Pembayaran</Label>
             <div className="grid grid-cols-3 gap-1 md:gap-2">
               {[
-                { value: "CASH", label: "Cash", icon: Banknote },
+                { value: "CASH", label: "Tunai", icon: Banknote },
                 { value: "TRANSFER", label: "Transfer", icon: CreditCard },
                 { value: "QRIS", label: "QRIS", icon: QrCode },
               ].map(({ value, label, icon: Icon }) => (
@@ -584,7 +584,7 @@ export function POSContent() {
           {/* Paid Amount (Cash only) */}
           {paymentMethod === "CASH" && (
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Paid Amount</Label>
+              <Label className="text-sm font-medium">Jumlah Pembayaran</Label>
               <Input
                 type="number"
                 value={paidAmount || ""}
@@ -609,7 +609,7 @@ export function POSContent() {
               {paidAmount > 0 && paidAmount >= grandTotal && (
                 <div className="flex justify-between items-center rounded-lg bg-emerald-500/10 p-3">
                   <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                    Change
+                    Kembalian
                   </span>
                   <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
                     {formatCurrency(changeAmount)}
@@ -620,11 +620,11 @@ export function POSContent() {
           )}
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Notes</Label>
+            <Label className="text-sm font-medium">Catatan</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional notes..."
+              placeholder="Catatan opsional..."
               rows={2}
               className="resize-none"
             />
@@ -640,7 +640,7 @@ export function POSContent() {
               onClick={() => setCheckoutDialogOpen(true)}
             >
               <Check className="h-5 w-5" />
-              Complete Payment
+              Selesaikan Pembayaran
             </Button>
           </div>
         </CardContent>
@@ -650,12 +650,12 @@ export function POSContent() {
       <Dialog open={checkoutDialogOpen} onOpenChange={setCheckoutDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Transaction</DialogTitle>
+            <DialogTitle>Konfirmasi Transaksi</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="rounded-lg bg-muted p-4 space-y-2">
               <div className="flex justify-between">
-                <span>Items</span>
+                <span>Item</span>
                 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
               </div>
               <div className="flex justify-between">
@@ -664,27 +664,27 @@ export function POSContent() {
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-destructive">
-                  <span>Discount</span>
+                  <span>Diskon</span>
                   <span>-{formatCurrency(discount)}</span>
                 </div>
               )}
               <Separator />
               <div className="flex justify-between font-bold text-lg">
-                <span>Grand Total</span>
+                <span>Total Akhir</span>
                 <span className="text-primary">{formatCurrency(grandTotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Payment</span>
+                <span>Pembayaran</span>
                 <Badge>{paymentMethod}</Badge>
               </div>
               {paymentMethod === "CASH" && (
                 <>
                   <div className="flex justify-between">
-                    <span>Paid</span>
+                    <span>Dibayar</span>
                     <span>{formatCurrency(paidAmount)}</span>
                   </div>
                   <div className="flex justify-between text-emerald-600 font-semibold">
-                    <span>Change</span>
+                    <span>Kembalian</span>
                     <span>{formatCurrency(changeAmount)}</span>
                   </div>
                 </>
@@ -696,7 +696,7 @@ export function POSContent() {
                 className="flex-1"
                 onClick={() => setCheckoutDialogOpen(false)}
               >
-                Cancel
+                Batal
               </Button>
               <Button
                 className="flex-1 gap-2"
@@ -705,11 +705,11 @@ export function POSContent() {
               >
                 {isCheckingOut ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Processing...
+                    <Loader2 className="h-4 w-4 animate-spin" /> Memproses...
                   </>
                 ) : (
                   <>
-                    <Check className="h-4 w-4" /> Confirm
+                    <Check className="h-4 w-4" /> Konfirmasi
                   </>
                 )}
               </Button>

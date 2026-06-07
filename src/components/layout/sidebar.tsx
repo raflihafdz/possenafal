@@ -26,17 +26,17 @@ interface SidebarProps {
 
 const adminNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/pos", label: "POS Cashier", icon: ShoppingCart },
-  { href: "/categories", label: "Categories", icon: FolderTree },
-  { href: "/products", label: "Products", icon: Package },
-  { href: "/transactions", label: "Transactions", icon: History },
-  { href: "/stock", label: "Stock Management", icon: Boxes },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/pos", label: "Kasir POS", icon: ShoppingCart },
+  { href: "/categories", label: "Kategori", icon: FolderTree },
+  { href: "/products", label: "Produk", icon: Package },
+  { href: "/transactions", label: "Transaksi", icon: History },
+  { href: "/stock", label: "Manajemen Stok", icon: Boxes },
+  { href: "/reports", label: "Laporan", icon: BarChart3 },
 ];
 
 const cashierNavItems = [
-  { href: "/pos", label: "POS Cashier", icon: ShoppingCart },
-  { href: "/transactions", label: "Transactions", icon: History },
+  { href: "/pos", label: "Kasir POS", icon: ShoppingCart },
+  { href: "/transactions", label: "Transaksi", icon: History },
 ];
 
 export function Sidebar({ role, collapsed, onToggle }: SidebarProps) {
