@@ -303,11 +303,6 @@ export function POSContent() {
       <div className="flex-1 flex flex-col min-h-0 min-w-0">
         <div className="mb-2 md:mb-4">
           <h1 className="text-xl md:text-2xl font-bold tracking-tight">Kasir POS</h1>
-          <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
-            Tekan <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F2</kbd> untuk mencari
-            {" • "}
-            <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">F9</kbd> untuk checkout
-          </p>
         </div>
 
         {/* Search */}
