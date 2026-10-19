@@ -54,6 +54,7 @@ export function TransactionsContent() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -67,6 +68,7 @@ export function TransactionsContent() {
         page,
         limit: 10,
         status: statusFilter || undefined,
+        paymentMethod: paymentMethodFilter || undefined,
         startDate: startDate || undefined,
         endDate: endDate || undefined,
       });
@@ -77,7 +79,7 @@ export function TransactionsContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [search, page, statusFilter, startDate, endDate]);
+  }, [search, page, statusFilter, paymentMethodFilter, startDate, endDate]);
 
   useEffect(() => {
     fetchTransactions();
@@ -189,6 +191,17 @@ export function TransactionsContent() {
             <SelectItem value="all">Semua Status</SelectItem>
             <SelectItem value="COMPLETED">Selesai</SelectItem>
             <SelectItem value="CANCELLED">Dibatalkan</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={paymentMethodFilter} onValueChange={(val: string | null) => { setPaymentMethodFilter(val === "all" || val === null ? "" : val); setPage(1); }}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Semua Pembayaran" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Pembayaran</SelectItem>
+            <SelectItem value="CASH">Tunai</SelectItem>
+            <SelectItem value="TRANSFER">Transfer</SelectItem>
+            <SelectItem value="QRIS">QRIS</SelectItem>
           </SelectContent>
         </Select>
         <div className="flex items-center gap-2">

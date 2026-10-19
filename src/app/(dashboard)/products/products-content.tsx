@@ -68,6 +68,7 @@ interface Category {
 
 const defaultFormData = {
   categoryId: "",
+  categoryName: "",
   code: "",
   barcode: "",
   name: "",
@@ -139,6 +140,7 @@ export function ProductsContent() {
     setEditingProduct(product);
     setFormData({
       categoryId: product.categoryId,
+      categoryName: product.category.name,
       code: product.code,
       barcode: product.barcode || "",
       name: product.name,
@@ -359,11 +361,18 @@ export function ProductsContent() {
             </div>
             <div className="space-y-2">
               <Label>Kategori</Label>
-              <Select value={formData.categoryId || ""} onValueChange={(val: string | null) => setFormData({ ...formData, categoryId: val || "" })}>
+              <Select
+                value={formData.categoryName || ""}
+                onValueChange={(val: string | null) => {
+                  if (!val) return;
+                  const selected = categories.find((c) => c.name === val);
+                  if (selected) setFormData({ ...formData, categoryId: selected.id, categoryName: selected.name });
+                }}
+              >
                 <SelectTrigger><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -375,21 +384,49 @@ export function ProductsContent() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Harga Beli</Label>
-                <Input type="number" value={formData.purchasePrice} onChange={(e) => setFormData({ ...formData, purchasePrice: Number(e.target.value) })} min={0} required />
+                <Input
+                  type="number"
+                  value={formData.purchasePrice === 0 ? "" : formData.purchasePrice}
+                  onChange={(e) => setFormData({ ...formData, purchasePrice: Number(e.target.value) || 0 })}
+                  placeholder="0"
+                  min={0}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label>Harga Jual</Label>
-                <Input type="number" value={formData.sellingPrice} onChange={(e) => setFormData({ ...formData, sellingPrice: Number(e.target.value) })} min={0} required />
+                <Input
+                  type="number"
+                  value={formData.sellingPrice === 0 ? "" : formData.sellingPrice}
+                  onChange={(e) => setFormData({ ...formData, sellingPrice: Number(e.target.value) || 0 })}
+                  placeholder="0"
+                  min={0}
+                  required
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Stok</Label>
-                <Input type="number" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })} min={0} required />
+                <Input
+                  type="number"
+                  value={formData.stock === 0 ? "" : formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) || 0 })}
+                  placeholder="0"
+                  min={0}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label>Stok Minimum</Label>
-                <Input type="number" value={formData.minStock} onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) })} min={0} required />
+                <Input
+                  type="number"
+                  value={formData.minStock === 0 ? "" : formData.minStock}
+                  onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) || 0 })}
+                  placeholder="0"
+                  min={0}
+                  required
+                />
               </div>
             </div>
             <div className="flex items-center gap-2">

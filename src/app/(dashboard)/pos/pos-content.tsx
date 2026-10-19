@@ -437,8 +437,8 @@ export function POSContent() {
         )}
 
         {/* Cart Items */}
-        <Card className="flex-1 min-h-0 flex flex-col">
-          <CardHeader className="pb-3">
+        <Card className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <CardHeader className="pb-3 shrink-0">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <ShoppingCart className="h-5 w-5" />
@@ -451,8 +451,8 @@ export function POSContent() {
               )}
             </div>
           </CardHeader>
-          <Separator />
-          <ScrollArea className="flex-1">
+          <Separator className="shrink-0" />
+          <ScrollArea className="flex-1 h-0">
             <CardContent className="p-4">
               {cart.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -471,7 +471,7 @@ export function POSContent() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{item.productName}</p>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(item.price)} × {item.quantity}
+                          {formatCurrency(item.price)} × {item.quantity} kg
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -495,6 +495,7 @@ export function POSContent() {
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
+                        <span className="text-xs font-medium text-muted-foreground ml-0.5">kg</span>
                       </div>
                       <p className="text-sm font-semibold w-24 text-right">
                         {formatCurrency(item.subtotal)}

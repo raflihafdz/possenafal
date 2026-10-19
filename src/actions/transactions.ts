@@ -126,11 +126,12 @@ export async function getTransactions(params?: {
   page?: number;
   limit?: number;
   status?: string;
+  paymentMethod?: string;
   startDate?: string;
   endDate?: string;
   userId?: string;
 }) {
-  const { search = "", page = 1, limit = 10, status, startDate, endDate, userId } = params || {};
+  const { search = "", page = 1, limit = 10, status, paymentMethod, startDate, endDate, userId } = params || {};
   const skip = (page - 1) * limit;
 
   const where = {
@@ -140,6 +141,7 @@ export async function getTransactions(params?: {
       ],
     }),
     ...(status && { status: status as "COMPLETED" | "CANCELLED" }),
+    ...(paymentMethod && { paymentMethod: paymentMethod as "CASH" | "DEBIT" | "QRIS" | "TRANSFER" }),
     ...(userId && { userId }),
     ...(startDate || endDate
       ? {
