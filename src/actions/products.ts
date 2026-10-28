@@ -101,6 +101,7 @@ export async function createProduct(data: unknown) {
         barcode: validated.data.barcode || null,
         description: validated.data.description || null,
         image: validated.data.image || null,
+        pricePerKg: validated.data.pricePerKg ?? null,
       },
     });
     revalidatePath("/products");
@@ -132,6 +133,7 @@ export async function updateProduct(id: string, data: unknown) {
         barcode: validated.data.barcode || null,
         description: validated.data.description || null,
         image: validated.data.image || null,
+        pricePerKg: validated.data.pricePerKg ?? null,
       },
     });
     revalidatePath("/products");

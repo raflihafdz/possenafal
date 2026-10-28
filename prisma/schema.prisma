@@ -67,8 +67,10 @@ model Product {
   description    String?
   purchasePrice  Float
   sellingPrice   Float
-  stock          Int              @default(0)
-  minStock       Int              @default(5)
+  soldByWeight   Boolean          @default(false)
+  pricePerKg     Float?
+  stock          Float            @default(0)
+  minStock       Float            @default(5)
   image          String?
   isActive       Boolean          @default(true)
   createdAt      DateTime         @default(now())
@@ -106,7 +108,10 @@ model TransactionItem {
   productId     String
   productName   String
   price         Float
-  quantity      Int
+  quantity      Float
+  soldByWeight  Boolean     @default(false)
+  weightKg      Float?
+  pricePerKg    Float?
   discount      Float       @default(0)
   subtotal      Float
   createdAt     DateTime    @default(now())
@@ -122,9 +127,9 @@ model StockMovement {
   productId     String
   userId        String
   type          StockMovementType
-  quantity      Int
-  stockBefore   Int
-  stockAfter    Int
+  quantity      Float
+  stockBefore   Float
+  stockAfter    Float
   referenceType String?
   referenceId   String?
   notes         String?

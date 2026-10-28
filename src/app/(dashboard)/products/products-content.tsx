@@ -53,6 +53,8 @@ interface Product {
   description: string | null;
   purchasePrice: number;
   sellingPrice: number;
+  soldByWeight: boolean;
+  pricePerKg: number | null;
   stock: number;
   minStock: number;
   image: string | null;
@@ -75,6 +77,8 @@ const defaultFormData = {
   description: "",
   purchasePrice: 0,
   sellingPrice: 0,
+  soldByWeight: false,
+  pricePerKg: 0,
   stock: 0,
   minStock: 5,
   image: "",
@@ -147,6 +151,8 @@ export function ProductsContent() {
       description: product.description || "",
       purchasePrice: product.purchasePrice,
       sellingPrice: product.sellingPrice,
+      soldByWeight: product.soldByWeight,
+      pricePerKg: product.pricePerKg ?? 0,
       stock: product.stock,
       minStock: product.minStock,
       image: product.image || "",
@@ -405,15 +411,45 @@ export function ProductsContent() {
                 />
               </div>
             </div>
+            {/* Sold by weight toggle */}
+            <div className="flex items-center gap-3 rounded-lg border p-3">
+              <Switch
+                id="soldByWeight"
+                checked={formData.soldByWeight}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, soldByWeight: checked, pricePerKg: checked ? formData.pricePerKg : 0 })
+                }
+              />
+              <div>
+                <Label htmlFor="soldByWeight" className="cursor-pointer font-medium">Jual per Berat (kg)</Label>
+                <p className="text-xs text-muted-foreground">Aktifkan jika produk dijual berdasarkan berat</p>
+              </div>
+            </div>
+            {formData.soldByWeight && (
+              <div className="space-y-2">
+                <Label>Harga per Kg (Rp/kg)</Label>
+                <Input
+                  type="number"
+                  value={formData.pricePerKg === 0 ? "" : formData.pricePerKg}
+                  onChange={(e) => setFormData({ ...formData, pricePerKg: Number(e.target.value) || 0 })}
+                  placeholder="Contoh: 50000"
+                  min={0}
+                  step={100}
+                  required={formData.soldByWeight}
+                />
+                <p className="text-xs text-muted-foreground">Harga ini yang akan digunakan di kasir saat input berat</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Stok</Label>
+                <Label>Stok (kg / pcs)</Label>
                 <Input
                   type="number"
                   value={formData.stock === 0 ? "" : formData.stock}
                   onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) || 0 })}
                   placeholder="0"
                   min={0}
+                  step={formData.soldByWeight ? 0.1 : 1}
                   required
                 />
               </div>
@@ -425,6 +461,7 @@ export function ProductsContent() {
                   onChange={(e) => setFormData({ ...formData, minStock: Number(e.target.value) || 0 })}
                   placeholder="0"
                   min={0}
+                  step={formData.soldByWeight ? 0.1 : 1}
                   required
                 />
               </div>

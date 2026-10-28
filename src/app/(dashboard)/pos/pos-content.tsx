@@ -13,6 +13,7 @@ import {
   Loader2,
   Check,
   X,
+  Scale,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,8 @@ interface SearchProduct {
   barcode: string | null;
   name: string;
   sellingPrice: number;
+  soldByWeight: boolean;
+  pricePerKg: number | null;
   stock: number;
   category: { name: string };
 }
@@ -49,6 +52,130 @@ interface SearchProduct {
 interface POSCategory {
   id: string;
   name: string;
+}
+
+// Dialog for entering weight when product is sold by weight
+function WeightInputDialog({
+  open,
+  onOpenChange,
+  product,
+  onConfirm,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  product: SearchProduct | null;
+  onConfirm: (weightKg: number) => void;
+}) {
+  const [weight, setWeight] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setWeight("");
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [open]);
+
+  const weightNum = parseFloat(weight) || 0;
+  const pricePerKg = product?.pricePerKg ?? 0;
+  const estimatedPrice = weightNum * pricePerKg;
+
+  const quickWeights = [0.25, 0.5, 0.75, 1, 1.5, 2];
+
+  const handleConfirm = () => {
+    if (weightNum <= 0) {
+      toast.error("Masukkan berat yang valid");
+      return;
+    }
+    onConfirm(weightNum);
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-primary" />
+            Input Berat
+          </DialogTitle>
+        </DialogHeader>
+        {product && (
+          <div className="space-y-4">
+            <div className="rounded-lg bg-muted p-3">
+              <p className="font-semibold">{product.name}</p>
+              <p className="text-sm text-muted-foreground">
+                Harga: {formatCurrency(pricePerKg)} / kg
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Stok: {product.stock} kg
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Berat (kg)</Label>
+              <Input
+                ref={inputRef}
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                placeholder="Contoh: 1.5"
+                min={0.001}
+                step={0.001}
+                className="h-12 text-xl font-semibold text-center"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleConfirm();
+                }}
+              />
+              <div className="grid grid-cols-3 gap-1.5">
+                {quickWeights.map((w) => (
+                  <Button
+                    key={w}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => setWeight(String(w))}
+                  >
+                    {w} kg
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {weightNum > 0 && (
+              <div className="rounded-lg bg-primary/10 p-3 text-center">
+                <p className="text-sm text-muted-foreground">Estimasi Harga</p>
+                <p className="text-xl font-bold text-primary">
+                  {formatCurrency(estimatedPrice)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {weightNum} kg × {formatCurrency(pricePerKg)}/kg
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => onOpenChange(false)}
+              >
+                Batal
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleConfirm}
+                disabled={weightNum <= 0}
+              >
+                Tambah ke Keranjang
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export function POSContent() {
@@ -65,14 +192,18 @@ export function POSContent() {
   const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
   const [lastInvoice, setLastInvoice] = useState("");
-  
+
+  // Weight input dialog
+  const [weightDialogOpen, setWeightDialogOpen] = useState(false);
+  const [pendingWeightProduct, setPendingWeightProduct] = useState<SearchProduct | null>(null);
+
   // New states for category view
   const [categories, setCategories] = useState<POSCategory[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [categoryProducts, setCategoryProducts] = useState<SearchProduct[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  
+
   const searchRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -178,7 +309,67 @@ export function POSContent() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [cart.length]);
 
+  // Add a weight-based product to cart
+  const addWeightItemToCart = (product: SearchProduct, weightKg: number) => {
+    const pricePerKg = product.pricePerKg ?? product.sellingPrice;
+    const subtotal = Math.round(weightKg * pricePerKg * 100) / 100;
+
+    const existing = cart.find((item) => item.productId === product.id);
+    if (existing) {
+      // For weight products, update weight and recalculate
+      const newWeight = (existing.weightKg ?? 0) + weightKg;
+      if (newWeight > product.stock) {
+        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} kg`);
+        return;
+      }
+      setCart(
+        cart.map((item) =>
+          item.productId === product.id
+            ? {
+                ...item,
+                weightKg: Math.round(newWeight * 1000) / 1000,
+                quantity: Math.round(newWeight * 1000) / 1000,
+                subtotal: Math.round(newWeight * pricePerKg * 100) / 100,
+              }
+            : item
+        )
+      );
+    } else {
+      if (weightKg > product.stock) {
+        toast.error(`Stok tidak mencukupi. Tersedia: ${product.stock} kg`);
+        return;
+      }
+      setCart([
+        ...cart,
+        {
+          productId: product.id,
+          productName: product.name,
+          price: pricePerKg,
+          quantity: weightKg,
+          soldByWeight: true,
+          weightKg,
+          pricePerKg,
+          discount: 0,
+          subtotal,
+          maxStock: product.stock,
+        },
+      ]);
+    }
+
+    setSearchQuery("");
+    setShowResults(false);
+    searchRef.current?.focus();
+    toast.success(`${product.name} (${weightKg} kg) ditambahkan ke keranjang`);
+  };
+
   const addToCart = (product: SearchProduct) => {
+    // If sold by weight, open weight dialog
+    if (product.soldByWeight) {
+      setPendingWeightProduct(product);
+      setWeightDialogOpen(true);
+      return;
+    }
+
     const existing = cart.find((item) => item.productId === product.id);
 
     if (existing) {
@@ -205,6 +396,9 @@ export function POSContent() {
           productName: product.name,
           price: product.sellingPrice,
           quantity: 1,
+          soldByWeight: false,
+          weightKg: null,
+          pricePerKg: null,
           discount: 0,
           subtotal: product.sellingPrice,
           maxStock: product.stock,
@@ -223,6 +417,22 @@ export function POSContent() {
       cart
         .map((item) => {
           if (item.productId !== productId) return item;
+          if (item.soldByWeight) {
+            // For weight items, delta is in steps of 0.1 kg
+            const step = 0.1;
+            const newWeight = Math.round((item.weightKg ?? item.quantity) * 1000 + delta * step * 1000) / 1000;
+            if (newWeight <= 0) return item;
+            if (newWeight > item.maxStock) {
+              toast.error(`Stok tidak mencukupi. Tersedia: ${item.maxStock} kg`);
+              return item;
+            }
+            return {
+              ...item,
+              weightKg: newWeight,
+              quantity: newWeight,
+              subtotal: Math.round(newWeight * (item.pricePerKg ?? item.price) * 100) / 100,
+            };
+          }
           const newQty = item.quantity + delta;
           if (newQty <= 0) return item;
           if (newQty > item.maxStock) {
@@ -235,6 +445,26 @@ export function POSContent() {
             subtotal: newQty * item.price - item.discount,
           };
         })
+    );
+  };
+
+  // Directly set weight for weight-based item
+  const setItemWeight = (productId: string, newWeight: number) => {
+    setCart(
+      cart.map((item) => {
+        if (item.productId !== productId || !item.soldByWeight) return item;
+        if (newWeight <= 0) return item;
+        if (newWeight > item.maxStock) {
+          toast.error(`Stok tidak mencukupi. Tersedia: ${item.maxStock} kg`);
+          return item;
+        }
+        return {
+          ...item,
+          weightKg: newWeight,
+          quantity: newWeight,
+          subtotal: Math.round(newWeight * (item.pricePerKg ?? item.price) * 100) / 100,
+        };
+      })
     );
   };
 
@@ -279,7 +509,7 @@ export function POSContent() {
       setCheckoutDialogOpen(false);
       setReceiptDialogOpen(true);
       clearCart();
-      
+
       // Reload products to refresh stock numbers
       if (selectedCategoryId) {
         const reloadedProducts = await getProducts({
@@ -332,17 +562,24 @@ export function POSContent() {
                     className="w-full flex items-center justify-between p-3 hover:bg-accent transition-colors border-b last:border-0 text-left"
                   >
                     <div>
-                      <p className="font-medium">{product.name}</p>
+                      <p className="font-medium flex items-center gap-1.5">
+                        {product.name}
+                        {product.soldByWeight && (
+                          <Scale className="h-3.5 w-3.5 text-primary" />
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {product.code} • {product.category.name}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-primary">
-                        {formatCurrency(product.sellingPrice)}
+                        {product.soldByWeight
+                          ? `${formatCurrency(product.pricePerKg ?? 0)}/kg`
+                          : formatCurrency(product.sellingPrice)}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Stock: {product.stock}
+                        Stok: {product.stock} {product.soldByWeight ? "kg" : "pcs"}
                       </p>
                     </div>
                   </button>
@@ -416,12 +653,17 @@ export function POSContent() {
                     onClick={() => addToCart(product)}
                     className="flex flex-col items-start p-2 rounded-lg border border-muted-foreground/20 hover:border-primary hover:bg-accent transition-all text-left text-xs"
                   >
-                    <p className="font-medium truncate w-full">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatCurrency(product.sellingPrice)}
+                    <p className="font-medium truncate w-full flex items-center gap-1">
+                      {product.soldByWeight && <Scale className="h-3 w-3 text-primary shrink-0" />}
+                      <span className="truncate">{product.name}</span>
+                    </p>
+                    <p className="text-xs text-primary font-semibold">
+                      {product.soldByWeight
+                        ? `${formatCurrency(product.pricePerKg ?? 0)}/kg`
+                        : formatCurrency(product.sellingPrice)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Stok: {product.stock}
+                      Stok: {product.stock} {product.soldByWeight ? "kg" : ""}
                     </p>
                   </button>
                 ))}
@@ -469,9 +711,14 @@ export function POSContent() {
                       className="flex items-center gap-3 rounded-lg border p-3"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{item.productName}</p>
+                        <p className="font-medium truncate flex items-center gap-1.5">
+                          {item.soldByWeight && <Scale className="h-3.5 w-3.5 text-primary shrink-0" />}
+                          {item.productName}
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(item.price)} × {item.quantity} kg
+                          {item.soldByWeight
+                            ? `${formatCurrency(item.pricePerKg ?? item.price)}/kg`
+                            : formatCurrency(item.price)}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -480,13 +727,26 @@ export function POSContent() {
                           size="icon"
                           className="h-7 w-7"
                           onClick={() => updateQuantity(item.productId, -1)}
-                          disabled={item.quantity <= 1}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
-                        <span className="w-8 text-center text-sm font-medium">
-                          {item.quantity}
-                        </span>
+                        {item.soldByWeight ? (
+                          <Input
+                            type="number"
+                            value={item.weightKg ?? item.quantity}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value) || 0;
+                              setItemWeight(item.productId, val);
+                            }}
+                            className="w-16 h-7 text-center text-sm font-medium px-1"
+                            min={0.001}
+                            step={0.1}
+                          />
+                        ) : (
+                          <span className="w-8 text-center text-sm font-medium">
+                            {item.quantity}
+                          </span>
+                        )}
                         <Button
                           variant="outline"
                           size="icon"
@@ -495,7 +755,9 @@ export function POSContent() {
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
-                        <span className="text-xs font-medium text-muted-foreground ml-0.5">kg</span>
+                        <span className="text-xs font-medium text-muted-foreground ml-0.5">
+                          {item.soldByWeight ? "kg" : "pcs"}
+                        </span>
                       </div>
                       <p className="text-sm font-semibold w-24 text-right">
                         {formatCurrency(item.subtotal)}
@@ -650,10 +912,20 @@ export function POSContent() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="rounded-lg bg-muted p-4 space-y-2">
-              <div className="flex justify-between">
-                <span>Item</span>
-                <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Item</span>
+                <span>{cart.length} item</span>
               </div>
+              {cart.map((item) => (
+                <div key={item.productId} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    {item.soldByWeight && <Scale className="h-3 w-3" />}
+                    {item.productName}
+                    {item.soldByWeight ? ` (${item.weightKg} kg)` : ` ×${item.quantity}`}
+                  </span>
+                  <span>{formatCurrency(item.subtotal)}</span>
+                </div>
+              ))}
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span>{formatCurrency(totalAmount)}</span>
@@ -713,6 +985,18 @@ export function POSContent() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Weight Input Dialog */}
+      <WeightInputDialog
+        open={weightDialogOpen}
+        onOpenChange={setWeightDialogOpen}
+        product={pendingWeightProduct}
+        onConfirm={(weightKg) => {
+          if (pendingWeightProduct) {
+            addWeightItemToCart(pendingWeightProduct, weightKg);
+          }
+        }}
+      />
 
       {/* Receipt Dialog */}
       <ReceiptDialog
